@@ -6,7 +6,7 @@ Based on the video [The Double Pendulum Fractal](https://www.youtube.com/watch?v
 
 ## References:
 
-General Classical Mechanics reference; Lagrangian for the Double Pendulum:
+General reference for analyzing classical mechanics systems; Lagrangian for the Double Pendulum:
 
  - Landau, Lifshitz. Mechanics, Course of Theoretical Physics Volume 1 (3rd edition). Translated by Skykes, Bell. Pergamon Press (1976).
 

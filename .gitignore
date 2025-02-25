@@ -5,5 +5,4 @@ __pycache__
 *.o
 *.gch
 !.gitignore
-*.mem
 program
