@@ -1,0 +1,18 @@
+{
+    "stepsPerFrame": {"name": "Steps/frame", "type": "int", "value": 10, "min": 0, "max": 100},
+    "dt": {"name": "Time step (s)", "type": "float", "value": 0.001, "min": -0.01, "max": 0.01, "step": 0.0001},
+    "mass1": {"name": "Mass 1 (kg)", "type": "float", "value": 1.0, "min": 0.1, "max": 10.0, "step": 0.01},
+    "length1": {"name": "Length 1 (m)", "type": "float", "value": 1.0, "min": 0.1, "max": 2.0, "step": 0.01},
+    "mass2": {"name": "Mass 2 (kg)", "type": "float", "value": 1.0, "min": 0.1, "max": 10.0, "step": 0.01},
+    "length2": {"name": "Length 2 (m)", "type": "float", "value": 1.0, "min": 0.1, "max": 2.0, "step": 0.01},
+    "gravity": {"name": "Acceleration due to gravity (m/s²)", "type": "float", "value": 9.81, "min": 0.0, "max": 20.0, "step": 0.01},
+    "pendulumDisplayWithInitialAngles": {"type": "Vec2", "value": [0.5, 0.5]},
+    "minPhi1": {"name": "Min. initial angle 1 (# of π radians)", "type": "float", "value": -1.0, "min": -1.0, "max": 1.0, "step": 0.01},
+    "maxPhi1": {"name": "Max. initial angle 1 (# of π radians)", "type": "float", "value": 1.0, "min": -1.0, "max": 1.0, "step": 0.01},
+    "minPhi2": {"name": "Min. initial angle 2 (# of π radians)", "type": "float", "value": -1.0, "min": -1.0, "max": 1.0, "step": 0.01},
+    "maxPhi2": {"name": "Max. initial angle 2 (# of π radians)", "type": "float", "value": 1.0, "min": -1.0, "max": 1.0, "step": 0.01},
+    "gridWidth": {"name": "Angle 1 discretization size", "type": "int", "value": 128, "min": 32, "max": 2048},
+    "gridHeight": {"name": "Angle 2 discretization size", "type": "int", "value": 128, "min": 32, "max": 2048},
+    "subGridWidth": {"name": "Sub sample width", "type": "int", "value": 1, "min": 1, "max": 100},
+    "subGridHeight": {"name": "Sub sample height", "type": "int", "value": 1, "min": 1, "max": 100}
+}
