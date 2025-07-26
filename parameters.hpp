@@ -6,6 +6,7 @@ namespace sim_2d {
 #define _PARAMETERS_
 
 struct SimParams {
+    bool useGPU = (bool)(true);
     int stepsPerFrame = (int)(10);
     float dt = (float)(0.001F);
     float mass1 = (float)(1.0F);
@@ -23,25 +24,29 @@ struct SimParams {
     int subGridWidth = (int)(1);
     int subGridHeight = (int)(1);
     enum {
-        STEPS_PER_FRAME=0,
-        DT=1,
-        MASS1=2,
-        LENGTH1=3,
-        MASS2=4,
-        LENGTH2=5,
-        GRAVITY=6,
-        PENDULUM_DISPLAY_WITH_INITIAL_ANGLES=7,
-        MIN_PHI1=8,
-        MAX_PHI1=9,
-        MIN_PHI2=10,
-        MAX_PHI2=11,
-        GRID_WIDTH=12,
-        GRID_HEIGHT=13,
-        SUB_GRID_WIDTH=14,
-        SUB_GRID_HEIGHT=15,
+        USE_G_P_U=0,
+        STEPS_PER_FRAME=1,
+        DT=2,
+        MASS1=3,
+        LENGTH1=4,
+        MASS2=5,
+        LENGTH2=6,
+        GRAVITY=7,
+        PENDULUM_DISPLAY_WITH_INITIAL_ANGLES=8,
+        MIN_PHI1=9,
+        MAX_PHI1=10,
+        MIN_PHI2=11,
+        MAX_PHI2=12,
+        GRID_WIDTH=13,
+        GRID_HEIGHT=14,
+        SUB_GRID_WIDTH=15,
+        SUB_GRID_HEIGHT=16,
     };
     void set(int enum_val, Uniform val) {
         switch(enum_val) {
+            case USE_G_P_U:
+            useGPU = val.b32;
+            break;
             case STEPS_PER_FRAME:
             stepsPerFrame = val.i32;
             break;
@@ -94,6 +99,8 @@ struct SimParams {
     }
     Uniform get(int enum_val) const {
         switch(enum_val) {
+            case USE_G_P_U:
+            return {(bool)useGPU};
             case STEPS_PER_FRAME:
             return {(int)stepsPerFrame};
             case DT:

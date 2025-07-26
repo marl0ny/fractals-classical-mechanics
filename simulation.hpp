@@ -56,9 +56,50 @@ struct Programs {
     Programs();
 };
 
+class CPUIntegration {
+    struct Coord {
+        double pi1;
+        double pi2;
+        double phi1;
+        double phi2;
+        Coord operator*(double a) {
+            return {
+                .pi1 = a*this->pi1,
+                .pi2 = a*this->pi2,
+                .phi1 = a*this->phi1,
+                .phi2 = a*this->phi2,
+            };
+        }
+        Coord operator+(Coord a) {
+            return {
+                .pi1 = this->pi1 + a.pi1,
+                .pi2 = this->pi2 + a.pi2,
+                .phi1 = this->phi1 + a.phi1,
+                .phi2 = this->phi2 + a.phi2,
+            };
+        }
+    };
+    std::vector<float> f_coords;
+    std::vector<Coord> coords;
+    std::vector<Coord> tmp_coords;
+    std::vector<std::vector<Coord>> rk4;
+    void compute_double_pendulum_dots(
+        std::vector<Coord> &dot_coords,
+        const std::vector<Coord> &coords,
+        DoublePendulumParams params);
+    public:
+    CPUIntegration();
+    void init_config(sim_2d::SimParams params);
+    void rk4_time_step(
+        DoublePendulumParams params, double dt);
+    void transfer_to_quad(Quad &dst);
+    
+};
+
 class Simulation {
     Programs m_programs;
     Frames m_frames;
+    CPUIntegration m_cpu_int;
     void draw_square_outline(sim_2d::SimParams params);
     public:
     Simulation(int window_width, int window_height, sim_2d::SimParams params);

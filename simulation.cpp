@@ -1,6 +1,8 @@
 #include "simulation.hpp"
 #include "pendulum_wire_frames.hpp"
 
+static const double PI = 3.141592653589793;
+
 static WireFrame get_quad_wire_frame() {
     return WireFrame(
         {{"position", Attribute{
@@ -141,7 +143,233 @@ Frames::Frames(
     quad_wire_frame(get_quad_wire_frame())
     {
 
+}
+
+CPUIntegration::CPUIntegration() {
+    this->coords = std::vector<Coord>(0);
+    this->tmp_coords = std::vector<Coord>(0);
+    this->rk4 = std::vector<std::vector<Coord>>(0);
+    this->f_coords = std::vector<float>(0);
+}
+
+void CPUIntegration::init_config(sim_2d::SimParams params) {
+    // printf("%d. %d\n", params.gridWidth, params.gridHeight);
+    double min_phi1 = PI*params.minPhi1;
+    double min_phi2 = PI*params.minPhi2;
+    double max_phi1 = PI*params.maxPhi1;
+    double max_phi2 = PI*params.maxPhi2;
+    this->coords = std::vector<Coord>(
+        params.gridWidth*params.gridHeight, 
+        {0.0, 0.0, 0.0, 0.0}
+    );
+    this->tmp_coords = std::vector<Coord>(
+        params.gridWidth*params.gridHeight, 
+        {0.0, 0.0, 0.0, 0.0}
+    );
+    this->f_coords = std::vector<float>(
+        params.gridWidth*params.gridHeight*4, 0.0);
+    this->rk4.resize(0);
+    for (int i = 0; i < 5; i++)
+        this->rk4.push_back(std::vector<Coord>(
+            params.gridWidth*params.gridHeight, 
+            {0.0, 0.0, 0.0, 0.0}));
+    for (int i = 0; i < params.gridHeight; i++) {
+        for (int j = 0; j < params.gridWidth; j++) {
+            int index = i*params.gridWidth + j;
+            double u = double(j + 0.5)/double(params.gridWidth);
+            double v = double(i + 0.5)/double(params.gridHeight);
+            this->coords[index].pi1 = 0.0;
+            this->coords[index].pi2 = 0.0;
+            double phi1 = min_phi1 + u*(max_phi1 - min_phi1);
+            double phi2 = min_phi2 + v*(max_phi2 - min_phi2);
+            this->coords[index].phi1 = phi1;
+            this->coords[index].phi2 = phi2;
+        }
     }
+}
+
+void CPUIntegration
+::compute_double_pendulum_dots(
+    std::vector<Coord> &dot_coords,
+    const std::vector<Coord> &coords,
+    DoublePendulumParams params) {
+    double mass1 = params.mass1;
+    double mass2 = params.mass2;
+    double length1 = params.length1;
+    double length2 = params.length2;
+    double gravity = params.gravity;
+    for (int i = 0; i < this->coords.size(); i++) {
+        Coord coord = coords[i];
+        double pi1 = coord.pi1, pi2 = coord.pi2;
+        double phi1 = coord.phi1, phi2 = coord.phi2;
+        double m11 = (mass1 + mass2)*length1;
+        double m12 = mass2*length1*length2*cos(phi1 - phi2);
+        double m21 = mass2*length1*length2*cos(phi1 - phi2);
+        double m22 = mass2*length2;
+        double dot_phi1 
+            = -m22*pi1/(m12*m21 - m22*m11) + m12*pi2/(m12*m21 - m22*m11);
+        double dot_phi2
+            = m21*pi1/(m12*m21 - m22*m11) - m11*pi2/(m12*m21 - m22*m11);
+        double dot_pi1 = -gravity*length1*(mass1+mass2)
+            *sin(phi1)+4.0*length1*length2*mass2*(0.5*mass1+0.5*mass2)
+            *pow((length1*pi2*cos(phi1-phi2)-pi1),2.0)*sin(phi1-phi2)
+            *cos(phi1-phi2)/pow((length1*length2*mass2
+                *pow(cos(phi1-phi2),2.0)-mass1-mass2),3.0)+4.0
+                *length1*length2*mass2
+                *(length1*pi2*cos(phi1-phi2)-pi1)
+                *(length2*mass2*pi1*cos(phi1-phi2)-pi2*(mass1+mass2))
+                *sin(phi1-phi2)*pow(cos(phi1-phi2),2.0)
+                /pow((length1*length2*mass2
+                    *pow(cos(phi1-phi2),2.0)-mass1-mass2),3.0)
+                    +2.0*length1*length2
+                    *pow((length2*mass2*pi1*cos(phi1-phi2)
+                    -pi2*(mass1+mass2)),2.0)
+                    *sin(phi1-phi2)*cos(phi1-phi2)/pow((length1*length2*mass2
+                        *pow(cos(phi1-phi2),2.0)-mass1-mass2),3.0)
+                        -2.0*length1*pi2*(0.5*mass1+0.5*mass2)
+                        *(length1*pi2*cos(phi1-phi2)-pi1)
+                        *sin(phi1-phi2)
+                        /pow((length1*length2*mass2
+                            *pow(cos(phi1-phi2),2.0)-mass1-mass2),2.0)
+                            -3.0*length1*pi2*(length2*mass2*pi1
+                                *cos(phi1-phi2)-pi2*(mass1+mass2))
+                                *sin(phi1-phi2)
+                                *cos(phi1-phi2)/pow((length1*length2*mass2
+                                    *pow(cos(phi1-phi2),2.0)
+                                    -mass1-mass2),2.0)-3.0*length2
+                                    *mass2*pi1
+                                    *(length1*pi2*cos(phi1-phi2)-pi1)
+                                    *sin(phi1-phi2)*cos(phi1-phi2)
+                                    /pow((length1*length2*mass2
+                                        *pow(cos(phi1-phi2),2.0)
+                                        -mass1-mass2),2.0)-1.0
+                                        *length2*pi1
+                                        *(length2*mass2
+                                            *pi1*cos(phi1-phi2)
+                                            -pi2*(mass1+mass2))
+                                            *sin(phi1-phi2)
+                                            /pow((length1*length2*mass2
+                                                *pow(cos(phi1-phi2),2.0)
+                                                -mass1-mass2),2.0)+2.0
+                                                *pi1*pi2*sin(phi1-phi2)
+                                                /(length1*length2*mass2
+                                                    *pow(cos(phi1-phi2),2.0)
+                                                    -mass1-mass2)
+                                                    -(length1*pi2*
+                                                        cos(phi1-phi2)-pi1)
+                                                        *(length2*mass2*pi1
+                                                            *cos(phi1-phi2)
+                                                        -pi2*(mass1+mass2))
+                                                        *sin(phi1-phi2)
+                                                        /pow((length1
+                                                            *length2*mass2
+                                                            *pow(
+                                                                cos(phi1
+                                                                    -phi2),
+                                                                2.0)
+                                                            -mass1
+                                                            -mass2),2.0);
+        double dot_pi2 
+            = -gravity*length2*mass2
+            *sin(phi2)-4.0*length1
+            *length2*mass2*(0.5*mass1+0.5*mass2)
+            *pow((length1*pi2*cos(phi1-phi2)-pi1),2.0)
+            *sin(phi1-phi2)*cos(phi1-phi2)
+            /pow((length1*length2*mass2*pow(cos(phi1-phi2),2.0)
+            -mass1-mass2),3.0)-4.0*length1*length2*mass2
+            *(length1*pi2*cos(phi1-phi2)-pi1)
+            *(length2*mass2*pi1*cos(phi1-phi2)-pi2
+            *(mass1+mass2))*sin(phi1-phi2)
+            *pow(cos(phi1-phi2),2.0)
+            /pow((length1*length2*mass2
+                *pow(cos(phi1-phi2),2.0)-mass1-mass2),3.0)
+                -2.0*length1*length2
+                *pow((length2*mass2*pi1*cos(phi1-phi2)
+                -pi2*(mass1+mass2)),2.0)*sin(phi1-phi2)
+                *cos(phi1-phi2)
+                /pow((length1*length2*mass2*pow(cos(phi1-phi2),2.0)
+                -mass1-mass2),3.0)+2.0*length1*pi2
+                *(0.5*mass1+0.5*mass2)
+                *(length1*pi2*cos(phi1-phi2)-pi1)
+                *sin(phi1-phi2)
+                /pow((length1*length2*mass2
+                    *pow(cos(phi1-phi2),2.0)-mass1-mass2),2.0)
+                    +3.0*length1*pi2*(length2*mass2*pi1
+                        *cos(phi1-phi2)-pi2*(mass1+mass2))
+                        *sin(phi1-phi2)*cos(phi1-phi2)
+                        /pow((length1*length2*mass2
+                            *pow(cos(phi1-phi2),2.0)-mass1-mass2),2.0)
+                            +3.0*length2*mass2*pi1
+                            *(length1*pi2*cos(phi1-phi2)-pi1)
+                            *sin(phi1-phi2)
+                            *cos(phi1-phi2)
+                            /pow((length1*length2
+                                *mass2*pow(cos(phi1-phi2),2.0)
+                                -mass1-mass2),2.0)
+                                +1.0*length2
+                                *pi1*(length2*mass2*pi1
+                                    *cos(phi1-phi2)-pi2*(mass1+mass2))
+                                    *sin(phi1-phi2)
+                                    /pow((length1*length2
+                                        *mass2*pow(cos(phi1-phi2)
+                                    ,2.0)-mass1-mass2),2.0)
+                                    -2.0*pi1*pi2*sin(phi1-phi2)
+                                    /(length1*length2*mass2
+                                        *pow(cos(phi1-phi2),2.0)
+                                        -mass1-mass2)
+                                        +(length1*pi2
+                                            *cos(phi1-phi2)-pi1)
+                                            *(length2*mass2*pi1
+                                                *cos(phi1-phi2)
+                                                -pi2*(mass1+mass2))
+                                                *sin(phi1-phi2)
+                                                /pow((length1*length2
+                                                    *mass2*pow(cos(phi1-phi2)
+                                                    ,2.0)-mass1-mass2),2.0);
+        dot_coords[i].pi1 = dot_pi1;
+        dot_coords[i].pi2 = dot_pi2;
+        dot_coords[i].phi1 = dot_phi1;
+        dot_coords[i].phi2 = dot_phi2;
+    }
+}
+
+void CPUIntegration::rk4_time_step(
+    DoublePendulumParams params, double dt
+) {
+    int size = this->coords.size();
+    for (int i = 0; i < size; i++)
+        this->rk4[0][i] = this->coords[i];
+    // q1
+    compute_double_pendulum_dots(
+        this->rk4[1], this->coords, params);
+    // q2
+    for (int i = 0; i < size; i++)
+        this->tmp_coords[i] = this->coords[i] + this->rk4[1][i]*(dt/2.0);
+    compute_double_pendulum_dots(this->rk4[1], this->tmp_coords, params);
+    // q3
+    for (int i = 0; i < size; i++)
+        this->tmp_coords[i] = this->coords[i] + this->rk4[2][i]*(dt/2.0);
+    compute_double_pendulum_dots(this->rk4[3], this->tmp_coords, params);
+    // q4
+    for (int i = 0; i < size; i++)
+        this->tmp_coords[i] = this->coords[i] + this->rk4[3][i]*(dt);
+    compute_double_pendulum_dots(this->rk4[4], this->tmp_coords, params);
+    for (int i = 0; i < size; i++)
+        this->coords[i] = this->rk4[0][i] + (
+            this->rk4[1][i] 
+            + this->rk4[2][i]*2.0 + this->rk4[3][i]*2.0 
+            + this->rk4[4][i])*(dt/6.0);
+}
+
+void CPUIntegration::transfer_to_quad(Quad &dst) {
+    for (int i = 0; i < this->coords.size(); i++) {
+        this->f_coords[4*i] = this->coords[i].pi1;
+        this->f_coords[4*i + 1] = this->coords[i].pi2;
+        this->f_coords[4*i + 2] = this->coords[i].phi1;
+        this->f_coords[4*i + 3] = this->coords[i].phi2;
+    }
+    dst.set_pixels((float *)&this->f_coords[0]);
+}
 
 
 static void add2(
@@ -270,26 +498,27 @@ static void double_pendulum_rk4_time_step(
     );
 }
 
-const float PI = 3.141592653589793;
-
 Simulation::Simulation(int width, int height, sim_2d::SimParams params) :
     m_programs (),
     m_frames (
         width, height, 
         params.gridWidth, params.gridHeight, 
-        params.subGridWidth, params.subGridHeight) {
+        params.subGridWidth, params.subGridHeight),
+    m_cpu_int() {
     m_frames.coords.draw(
         m_programs.double_pendulum_init,
         {
-            {"minPhi1", PI*params.minPhi1},
-            {"maxPhi1", PI*params.maxPhi1},
-            {"minPhi2", PI*params.minPhi2},
-            {"maxPhi2", PI*params.maxPhi2}
+            {"minPhi1",float(PI*params.minPhi1)},
+            {"maxPhi1",float(PI*params.maxPhi1)},
+            {"minPhi2",float(PI*params.minPhi2)},
+            {"maxPhi2",float(PI*params.maxPhi2)}
         }
     );
 }
 
 void Simulation::init_config(sim_2d::SimParams params) {
+    if (!params.useGPU)
+        m_cpu_int.init_config(params);
     m_frames.sim_tex_params = 
         {
             .format=GL_RGBA32F, 
@@ -314,10 +543,10 @@ void Simulation::init_config(sim_2d::SimParams params) {
     m_frames.coords.draw(
         m_programs.double_pendulum_init,
         {
-            {"minPhi1", PI*params.minPhi1},
-            {"maxPhi1", PI*params.maxPhi1},
-            {"minPhi2", PI*params.minPhi2},
-            {"maxPhi2", PI*params.maxPhi2}
+            {"minPhi1", float(PI*params.minPhi1)},
+            {"maxPhi1", float(PI*params.maxPhi1)},
+            {"minPhi2", float(PI*params.minPhi2)},
+            {"maxPhi2", float(PI*params.maxPhi2)}
         }
     );
     // m_frames.sub_coords.reset(m_frames.sim_tex_params);
@@ -355,15 +584,15 @@ void Simulation::time_step(sim_2d::SimParams sim_params) {
     //     {STEP_P, 0.5}, 
     //     {STEP_X, 1.0},
     //     {STEP_P, 0.5}};
-    std::vector<SubStepWeight> weights = {
-        {STEP_X, 1.0},
-        {STEP_P, -1.0/24.0}, 
-        {STEP_X, -2.0/3.0},
-        {STEP_P, 3.0/4.0},
-        {STEP_X, 2.0/3.0},
-        {STEP_P, 7.0/24.0}
-    };
-    float third = 1.0/3.0;
+    // std::vector<SubStepWeight> weights = {
+    //     {STEP_X, 1.0},
+    //     {STEP_P, -1.0/24.0}, 
+    //     {STEP_X, -2.0/3.0},
+    //     {STEP_P, 3.0/4.0},
+    //     {STEP_X, 2.0/3.0},
+    //     {STEP_P, 7.0/24.0}
+    // };
+    // float third = 1.0/3.0;
     // std::vector<SubStepWeight> weights = {
     //     // 1
     //     {STEP_X, (float)(1.0/(2.0*(2.0 - pow(2.0, third))))},
@@ -387,6 +616,10 @@ void Simulation::time_step(sim_2d::SimParams sim_params) {
                 m_frames.coords: ((k % 2)? m_frames.tmp2: m_frames.tmp3), 
             m_programs, params, weight, dt);
     }*/
+    if (!sim_params.useGPU) {
+        m_cpu_int.rk4_time_step(params, dt);
+        return;
+    }
     ::double_pendulum_rk4_time_step(
         m_frames.coords, m_frames.rk4, m_frames.tmp1, m_frames.coords,
         m_programs, params, dt);
@@ -430,6 +663,8 @@ void Simulation::draw_square_outline(sim_2d::SimParams sim_params) {
 }
 
 const RenderTarget &Simulation::view(sim_2d::SimParams sim_params) {
+    if (!sim_params.useGPU)
+        m_cpu_int.transfer_to_quad(m_frames.coords);
     DoublePendulumParams params {
         .mass1=sim_params.mass1,
         .mass2=sim_params.mass2,

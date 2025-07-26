@@ -121,19 +121,20 @@ function createEntryBoxes(
 
 
 let controls = document.getElementById('controls');
-createScalarParameterSlider(controls, 0, "Steps/frame", "int", {'value': 10, 'min': 0, 'max': 100});
-createScalarParameterSlider(controls, 1, "Time step (s)", "float", {'value': 0.001, 'min': -0.01, 'max': 0.01, 'step': 0.0001});
-createScalarParameterSlider(controls, 2, "Mass 1 (kg)", "float", {'value': 1.0, 'min': 0.1, 'max': 10.0, 'step': 0.01});
-createScalarParameterSlider(controls, 3, "Length 1 (m)", "float", {'value': 1.0, 'min': 0.1, 'max': 2.0, 'step': 0.01});
-createScalarParameterSlider(controls, 4, "Mass 2 (kg)", "float", {'value': 1.0, 'min': 0.1, 'max': 10.0, 'step': 0.01});
-createScalarParameterSlider(controls, 5, "Length 2 (m)", "float", {'value': 1.0, 'min': 0.1, 'max': 2.0, 'step': 0.01});
-createScalarParameterSlider(controls, 6, "Acceleration due to gravity (m/s²)", "float", {'value': 9.81, 'min': 0.0, 'max': 20.0, 'step': 0.01});
-createScalarParameterSlider(controls, 8, "Min. initial angle 1 (# of π radians)", "float", {'value': -1.0, 'min': -1.0, 'max': 1.0, 'step': 0.01});
-createScalarParameterSlider(controls, 9, "Max. initial angle 1 (# of π radians)", "float", {'value': 1.0, 'min': -1.0, 'max': 1.0, 'step': 0.01});
-createScalarParameterSlider(controls, 10, "Min. initial angle 2 (# of π radians)", "float", {'value': -1.0, 'min': -1.0, 'max': 1.0, 'step': 0.01});
-createScalarParameterSlider(controls, 11, "Max. initial angle 2 (# of π radians)", "float", {'value': 1.0, 'min': -1.0, 'max': 1.0, 'step': 0.01});
-createScalarParameterSlider(controls, 12, "Angle 1 discretization size", "int", {'value': 128, 'min': 32, 'max': 2048});
-createScalarParameterSlider(controls, 13, "Angle 2 discretization size", "int", {'value': 128, 'min': 32, 'max': 2048});
-createScalarParameterSlider(controls, 14, "Sub sample width", "int", {'value': 1, 'min': 1, 'max': 1024});
-createScalarParameterSlider(controls, 15, "Sub sample height", "int", {'value': 1, 'min': 1, 'max': 1024});
+createCheckbox(controls, 0, "Numerical integration on GPU", true);
+createScalarParameterSlider(controls, 1, "Steps/frame", "int", {'value': 10, 'min': 0, 'max': 100});
+createScalarParameterSlider(controls, 2, "Time step (s)", "float", {'value': 0.001, 'min': -0.01, 'max': 0.01, 'step': 0.0001});
+createScalarParameterSlider(controls, 3, "Mass 1 (kg)", "float", {'value': 1.0, 'min': 0.1, 'max': 10.0, 'step': 0.01});
+createScalarParameterSlider(controls, 4, "Length 1 (m)", "float", {'value': 1.0, 'min': 0.1, 'max': 2.0, 'step': 0.01});
+createScalarParameterSlider(controls, 5, "Mass 2 (kg)", "float", {'value': 1.0, 'min': 0.1, 'max': 10.0, 'step': 0.01});
+createScalarParameterSlider(controls, 6, "Length 2 (m)", "float", {'value': 1.0, 'min': 0.1, 'max': 2.0, 'step': 0.01});
+createScalarParameterSlider(controls, 7, "Acceleration due to gravity (m/s²)", "float", {'value': 9.81, 'min': 0.0, 'max': 20.0, 'step': 0.01});
+createScalarParameterSlider(controls, 9, "Min. initial angle 1 (# of π radians)", "float", {'value': -1.0, 'min': -1.0, 'max': 1.0, 'step': 0.01});
+createScalarParameterSlider(controls, 10, "Max. initial angle 1 (# of π radians)", "float", {'value': 1.0, 'min': -1.0, 'max': 1.0, 'step': 0.01});
+createScalarParameterSlider(controls, 11, "Min. initial angle 2 (# of π radians)", "float", {'value': -1.0, 'min': -1.0, 'max': 1.0, 'step': 0.01});
+createScalarParameterSlider(controls, 12, "Max. initial angle 2 (# of π radians)", "float", {'value': 1.0, 'min': -1.0, 'max': 1.0, 'step': 0.01});
+createScalarParameterSlider(controls, 13, "Angle 1 discretization size", "int", {'value': 128, 'min': 32, 'max': 2048});
+createScalarParameterSlider(controls, 14, "Angle 2 discretization size", "int", {'value': 128, 'min': 32, 'max': 2048});
+createScalarParameterSlider(controls, 15, "Sub sample width", "int", {'value': 1, 'min': 1, 'max': 1024});
+createScalarParameterSlider(controls, 16, "Sub sample height", "int", {'value': 1, 'min': 1, 'max': 1024});
 

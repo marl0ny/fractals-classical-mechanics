@@ -482,12 +482,14 @@ class Quad {
     int get_id() const;
     void clear();
     void reset(const TextureParams &);
-    uint32_t width();
-    uint32_t height();
-    uint32_t format();
+    uint32_t width() const;
+    uint32_t height() const;
+    uint32_t format() const;
     void draw(uint32_t program, const Uniforms &uniforms,
               const Config = Config());
     void set_pixels(std::vector<float>);
+    void set_pixels(const std::vector<float> &, IVec4);
+    void set_pixels(float *arr);
     std::vector<float> get_float_pixels();
     std::vector<float> get_float_pixels(IVec4 viewport);
     std::vector<uint8_t> get_byte_pixels();
