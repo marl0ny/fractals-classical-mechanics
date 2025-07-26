@@ -51,17 +51,31 @@
         document.getElementById('canvas').addEventListener('mousemove', e => {
             let [x, y] = getNormalizedCanvasCoordinates(e);
             Module.set_left_xy(x, y);
-            // let strings = Module.get_strings();
-            // console.log(strings);
         });
         document.getElementById('canvas').addEventListener('mouseup', e => {
             let [x, y] = getNormalizedCanvasCoordinates(e);
-            let type = 0;
             Module.set_left_xy_type(x, y, 0);
         });
         document.getElementById('canvas').addEventListener('mousedown', e => {
             let [x, y] = getNormalizedCanvasCoordinates(e);
-            let type = 1;
+            Module.set_left_xy_type(x, y, 1);
+        });
+        document.getElementById('canvas').addEventListener('touchmove', e => {
+            let touches = e.changedTouches;
+            let e2 = {clientX: touches[0].pageX, clientY: touches[0].pageY};
+            let [x, y] = getNormalizedCanvasCoordinates(e2);
+            Module.set_left_xy(x, y);
+        });
+        document.getElementById('canvas').addEventListener('touchend', e => {
+            let touches = e.changedTouches;
+            let e2 = {clientX: touches[0].pageX, clientY: touches[0].pageY};
+            let [x, y] = getNormalizedCanvasCoordinates(e2);
+            Module.set_left_xy_type(x, y, 0);
+        });
+        document.getElementById('canvas').addEventListener('touchstart', e => {
+            let touches = e.changedTouches;
+            let e2 = {clientX: touches[0].pageX, clientY: touches[0].pageY};
+            let [x, y] = getNormalizedCanvasCoordinates(e2);
             Module.set_left_xy_type(x, y, 1);
         });
 

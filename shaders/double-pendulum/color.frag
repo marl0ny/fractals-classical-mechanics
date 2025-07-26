@@ -1,4 +1,4 @@
-/* Color the double pendulum based on its angular separations */
+/* Colour the double pendulum based on its angular separations */
 #if (__VERSION__ >= 330) || (defined(GL_ES) && __VERSION__ >= 300)
 #define texture2D texture
 #else

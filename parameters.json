@@ -13,6 +13,6 @@
     "maxPhi2": {"name": "Max. initial angle 2 (# of π radians)", "type": "float", "value": 1.0, "min": -1.0, "max": 1.0, "step": 0.01},
     "gridWidth": {"name": "Angle 1 discretization size", "type": "int", "value": 128, "min": 32, "max": 2048},
     "gridHeight": {"name": "Angle 2 discretization size", "type": "int", "value": 128, "min": 32, "max": 2048},
-    "subGridWidth": {"name": "Sub sample width", "type": "int", "value": 1, "min": 1, "max": 100},
-    "subGridHeight": {"name": "Sub sample height", "type": "int", "value": 1, "min": 1, "max": 100}
+    "subGridWidth": {"name": "Sub sample width", "type": "int", "value": 1, "min": 1, "max": 1024},
+    "subGridHeight": {"name": "Sub sample height", "type": "int", "value": 1, "min": 1, "max": 1024}
 }

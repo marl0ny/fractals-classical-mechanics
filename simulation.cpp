@@ -348,6 +348,45 @@ void Simulation::time_step(sim_2d::SimParams sim_params) {
         .gravity=sim_params.gravity,
     };
     float dt = sim_params.dt;
+    // std::vector<SubStepWeight> weights = {
+    //     {STEP_P, 1.0}, 
+    //     {STEP_X, 1.0},
+    // std::vector<SubStepWeight> weights = {
+    //     {STEP_P, 0.5}, 
+    //     {STEP_X, 1.0},
+    //     {STEP_P, 0.5}};
+    std::vector<SubStepWeight> weights = {
+        {STEP_X, 1.0},
+        {STEP_P, -1.0/24.0}, 
+        {STEP_X, -2.0/3.0},
+        {STEP_P, 3.0/4.0},
+        {STEP_X, 2.0/3.0},
+        {STEP_P, 7.0/24.0}
+    };
+    float third = 1.0/3.0;
+    // std::vector<SubStepWeight> weights = {
+    //     // 1
+    //     {STEP_X, (float)(1.0/(2.0*(2.0 - pow(2.0, third))))},
+    //     {STEP_P, (float)(1.0/(2.0 - pow(2.0, third)))}, 
+    //     // 2
+    //     {STEP_X, (float)((1.0 - pow(2.0, third))/(2.0*(2.0 - pow(2.0, third))))},
+    //     {STEP_P, (float)(-pow(2.0, third)/(2.0 - pow(2.0, third)))},
+    //     // 3
+    //     {STEP_X, (float)((1.0 - pow(2.0, third))/(2.0*(2.0 - pow(2.0, third))))},
+    //     {STEP_P, (float)(1.0/(2.0 - pow(2.0, third)))}, 
+    //     // 4
+    //     {STEP_X, (float)(1.0/(2.0*(2.0 - pow(2.0, third))))} 
+    // };
+    /* for (int k = weights.size() - 1; k >= 0; k--) {
+        SubStepWeight weight = weights[k];
+        double_pendulum_symplectic_sub_step(
+            (k == 0)? 
+                m_frames.coords: ((k % 2)? m_frames.tmp3: m_frames.tmp2),  
+            m_frames.tmp1, 
+            (k == (weights.size() - 1))? 
+                m_frames.coords: ((k % 2)? m_frames.tmp2: m_frames.tmp3), 
+            m_programs, params, weight, dt);
+    }*/
     ::double_pendulum_rk4_time_step(
         m_frames.coords, m_frames.rk4, m_frames.tmp1, m_frames.coords,
         m_programs, params, dt);

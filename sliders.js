@@ -134,6 +134,6 @@ createScalarParameterSlider(controls, 10, "Min. initial angle 2 (# of π radians
 createScalarParameterSlider(controls, 11, "Max. initial angle 2 (# of π radians)", "float", {'value': 1.0, 'min': -1.0, 'max': 1.0, 'step': 0.01});
 createScalarParameterSlider(controls, 12, "Angle 1 discretization size", "int", {'value': 128, 'min': 32, 'max': 2048});
 createScalarParameterSlider(controls, 13, "Angle 2 discretization size", "int", {'value': 128, 'min': 32, 'max': 2048});
-createScalarParameterSlider(controls, 14, "Sub sample width", "int", {'value': 1, 'min': 1, 'max': 100});
-createScalarParameterSlider(controls, 15, "Sub sample height", "int", {'value': 1, 'min': 1, 'max': 100});
+createScalarParameterSlider(controls, 14, "Sub sample width", "int", {'value': 1, 'min': 1, 'max': 1024});
+createScalarParameterSlider(controls, 15, "Sub sample height", "int", {'value': 1, 'min': 1, 'max': 1024});
 
